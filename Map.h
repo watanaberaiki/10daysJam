@@ -22,7 +22,12 @@ enum mapdate
 {
 	BLUNK,
 	BLOCK,
-	START
+	PLAYER,
+	GOAL,
+	CATUP,
+	CATLEFT,
+	CATDOWN,
+	CATRIGHT
 };
 
 class Map

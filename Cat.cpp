@@ -15,7 +15,6 @@ void Cat::Initialize(Model* model, uint32_t textureHandle) {
 
 	worldTransform_.Initialize();
 	worldTransform_.scale_ = { scale_,scale_,scale_ };
-	worldTransform_.translation_ = { 4,2,0 };
 
 }
 
@@ -54,38 +53,82 @@ void Cat::Move() {
 void Cat::OnMapCollision() {
 	if (direction_ == Direction::front) {
 		direction_ = Direction::right;
-		worldTransform_.translation_.z += 0.05;
+		worldTransform_.translation_.z += 0.1;
 		move = { 0,0,0 };
 		whichdirection = 1;
 	}
 	else if (direction_ == Direction::right) {
 		direction_ = Direction::back;
-		worldTransform_.translation_.x -= 0.05;
+		worldTransform_.translation_.x -= 0.1;
 		move = { 0,0,0 };
 		whichdirection = 2;
 	}
 	else if (direction_ == Direction::back) {
 		direction_ = Direction::left;
-		worldTransform_.translation_.z -= 0.05;
+		worldTransform_.translation_.z -= 0.1;
 		move = { 0,0,0 };
 		whichdirection = 3;
 	}
 	else if (direction_ == Direction::left) {
 		direction_ = Direction::front;
-		worldTransform_.translation_.x += 0.05;
+		worldTransform_.translation_.x += 0.1;
 		move = { 0,0,0 };
 		whichdirection = 0;
 	}
 }
 
 void Cat::FastSpeed() {
-	moveSpeed = 0.05;
+	moveSpeed = 0.1;
 }
 
 void Cat::Restore() {
-	moveSpeed = 0.01;
+	moveSpeed = 0.05;
 }
 
 void Cat::Pause() {
 	moveSpeed = 0;
+}
+
+void Cat::MapSet(Map* map) {
+
+	for (int i = 0; i < blockY; i++)
+	{
+		for (int j = 0; j < blockZ; j++)
+		{
+			for (int k = 0; k < blockX; k++) {
+
+				//プレイヤー位置初期化
+
+				if (map->map[i][j][k] == CATUP) {
+					direction_ = Direction::back;
+					worldTransform_.translation_.x = blockSize * k;
+					worldTransform_.translation_.y = blockSize * i;
+					worldTransform_.translation_.z = blockSize * j;
+
+				}
+				if (map->map[i][j][k] == CATLEFT) {
+					direction_ = Direction::left;
+					worldTransform_.translation_.x = blockSize * k;
+					worldTransform_.translation_.y = blockSize * i;
+					worldTransform_.translation_.z = blockSize * j;
+
+				}
+				if (map->map[i][j][k] == CATRIGHT) {
+					direction_ = Direction::right;
+					worldTransform_.translation_.x = blockSize * k;
+					worldTransform_.translation_.y = blockSize * i;
+					worldTransform_.translation_.z = blockSize * j;
+
+				}
+				if (map->map[i][j][k] == CATDOWN) {
+					direction_ = Direction::front;
+					worldTransform_.translation_.x = blockSize * k;
+					worldTransform_.translation_.y = blockSize * i;
+					worldTransform_.translation_.z = blockSize * j;
+
+				}
+			}
+		}
+	}
+
 }

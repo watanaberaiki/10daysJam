@@ -145,7 +145,7 @@ void Player::BlockManager(Map *map) {
 
 					//プレイヤー位置初期化
 
-					if (map->map[i][j][k] == START) {
+					if (map->map[i][j][k] == PLAYER) {
 
 						worldTransform_.translation_.x = blockSize * k;
 						worldTransform_.translation_.y = blockSize * i;

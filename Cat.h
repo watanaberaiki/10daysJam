@@ -11,6 +11,7 @@
 #include "Matrix.h"
 #include "memory"
 #include "list"
+#include "Map.h"
 
 enum class Direction {
 	front,		//前
@@ -46,6 +47,8 @@ public:
 	//元に戻す
 	void Restore();
 
+	void MapSet(Map *map);
+
 	//ゲッター
 	Vector3 GetTranslation() { return worldTransform_.translation_; }
 	Vector3 GetMove() { return move; }
@@ -76,11 +79,11 @@ private:
 	float gravity = 0.1;
 
 	//プレイヤーの大きさ	倍率をいじる
-	float scale_ = 0.9f;
+	float scale_ = 0.8f;
 	float size = scale_ * 2.0f;
 
 	//方向
-	Direction direction_ = Direction::back;
+	Direction direction_;
 
 	//方向チェック
 	int whichdirection = 2;
