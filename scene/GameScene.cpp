@@ -37,6 +37,9 @@ void GameScene::Initialize() {
 	newCat->Initialize(model_, textureHandle_);
 	cat_.reset(newCat);
 
+	map_->Loding("map1.csv");
+	savemap_->Loding("map1.csv");
+
 	//ビュープロジェクションの初期化
 	viewProjection_.eye = { 0,0,-50 };
 	viewProjection_.Initialize();
@@ -55,10 +58,17 @@ void GameScene::Initialize() {
 void GameScene::Update()
 {
 
+
 	MapCollision();
-	player_->Update();
+
+	//プレイヤー
+	player_->Update(map_);
+	
+	//デバッグカメラ
 	debugCamera_->Update();
 
+
+	//ネコ
 	cat_->Restore();
 
 	if (input_->PushKey(DIK_Z)) {
@@ -69,6 +79,10 @@ void GameScene::Update()
 		cat_->Pause();
 	}
 	cat_->Update();
+
+
+	////マップ
+	//map_->SetMap(0);
 }
 
 void GameScene::Draw() {
@@ -104,7 +118,7 @@ void GameScene::Draw() {
 		{
 			for (int k = 0; k < blockX; k++)
 			{
-				if (startMap[i][j][k] == 1)
+				if (savemap_->map[i][j][k] == 1)
 				{
 					model_->Draw(worldTransform_[i][j][k], debugCamera_->GetViewProjection(), textureHandle2);
 				}
@@ -161,10 +175,10 @@ void GameScene::MapCollision()
 	/////////////
 
 	//右に仮想的に移動して当たったら
-	if (mapcol(rightplayer, downplayer + player_->GetSize() / 2, frontplayer + 0.2) || mapcol(rightplayer, downplayer + player_->GetSize() / 2, backplayer - player_->GetSize() / 2) && player_->GetMove().x > 0)
+	if (savemap_->mapcol(rightplayer, downplayer + player_->GetSize() / 2, frontplayer + 0.2) || savemap_->mapcol(rightplayer, downplayer + player_->GetSize() / 2, backplayer - player_->GetSize() / 2) && player_->GetMove().x > 0)
 	{
 		//１ピクセル先に壁が来るまで移動
-		while ((mapcol(rightplayer, downplayer + player_->GetSize() / 2, frontplayer + 0.2) || mapcol(rightplayer, downplayer + player_->GetSize() / 2, backplayer - player_->GetSize() / 2)))
+		while ((savemap_->mapcol(rightplayer, downplayer + player_->GetSize() / 2, frontplayer + 0.2) || savemap_->mapcol(rightplayer, downplayer + player_->GetSize() / 2, backplayer - player_->GetSize() / 2)))
 		{
 			player_->OnMapCollisionX2();
 			rightplayer = player_->GetTranslation().x + player_->GetSize();
@@ -173,10 +187,10 @@ void GameScene::MapCollision()
 	}
 
 	//左に仮想的に移動して当たったら
-	if (mapcol(leftplayer, downplayer + player_->GetSize() / 2, frontplayer + 0.2) || mapcol(leftplayer, downplayer + player_->GetSize() / 2, backplayer - player_->GetSize() / 2) && player_->GetMove().x < 0)
+	if (savemap_->mapcol(leftplayer, downplayer + player_->GetSize() / 2, frontplayer + 0.2) || savemap_->mapcol(leftplayer, downplayer + player_->GetSize() / 2, backplayer - player_->GetSize() / 2) && player_->GetMove().x < 0)
 	{
 		//１ピクセル先に壁が来るまで移動
-		while ((mapcol(leftplayer, downplayer + player_->GetSize() / 2, frontplayer + 0.2) || mapcol(leftplayer, downplayer + player_->GetSize() / 2, backplayer - player_->GetSize() / 2)))
+		while ((savemap_->mapcol(leftplayer, downplayer + player_->GetSize() / 2, frontplayer + 0.2) || savemap_->mapcol(leftplayer, downplayer + player_->GetSize() / 2, backplayer - player_->GetSize() / 2)))
 		{
 			player_->OnMapCollisionX();
 			rightplayer = player_->GetTranslation().x + player_->GetSize();
@@ -188,10 +202,10 @@ void GameScene::MapCollision()
 
 	////y軸に対しての当たり判定
 	////上に仮想的に移動して当たったら
-	//if (mapcol(left, up, front))
+	//if (map_->mapcol(left, up, front))
 	//{
 	//	//１ピクセル先に壁が来るまで移動
-	//	while ((mapcol(left, up, front)))
+	//	while ((map_->mapcol(left, up, front)))
 	//	{
 	//		player_->OnMapCollisionY2();
 	//		up = player_->GetTranslation().y - player_->GetSize();
@@ -200,10 +214,10 @@ void GameScene::MapCollision()
 	//}
 
 	//下に仮想的に移動して当たったら
-	if (mapcol(leftplayer, downplayer, frontplayer + 0.2))
+	if (savemap_->mapcol(leftplayer, downplayer, frontplayer + 0.2))
 	{
 		//１ピクセル先に壁が来るまで移動
-		while ((mapcol(leftplayer, downplayer, frontplayer + 0.2)))
+		while ((savemap_->mapcol(leftplayer, downplayer, frontplayer + 0.2)))
 		{
 			player_->OnMapCollisionY();
 			upplayer = player_->GetTranslation().y - player_->GetSize();
@@ -216,10 +230,10 @@ void GameScene::MapCollision()
 
 	//z軸に対しての当たり判定
 	//奥に仮想的に移動して当たったら
-	if (mapcol(leftplayer, downplayer + player_->GetSize() / 2, backplayer) || mapcol(rightplayer, downplayer + player_->GetSize() / 2, backplayer) && player_->GetMove().z > 0)
+	if (savemap_->mapcol(leftplayer, downplayer + player_->GetSize() / 2, backplayer) || savemap_->mapcol(rightplayer, downplayer + player_->GetSize() / 2, backplayer) && player_->GetMove().z > 0)
 	{
 		//１ピクセル先に壁が来るまで移動
-		while ((mapcol(leftplayer, downplayer + player_->GetSize() / 2, backplayer) || mapcol(rightplayer, downplayer + player_->GetSize() / 2, backplayer)))
+		while ((savemap_->mapcol(leftplayer, downplayer + player_->GetSize() / 2, backplayer) || savemap_->mapcol(rightplayer, downplayer + player_->GetSize() / 2, backplayer)))
 		{
 			player_->OnMapCollisionZ2();
 			frontplayer = player_->GetTranslation().z;
@@ -227,10 +241,10 @@ void GameScene::MapCollision()
 		}
 	}
 	//手前に仮想的に移動して当たったら
-	if (mapcol(leftplayer, downplayer, frontplayer) || mapcol(rightplayer, downplayer, frontplayer) && player_->GetMove().z < 0)
+	if (savemap_->mapcol(leftplayer, downplayer, frontplayer) || savemap_->mapcol(rightplayer, downplayer, frontplayer) && player_->GetMove().z < 0)
 	{
 		//１ピクセル先に壁が来るまで移動
-		while ((mapcol(leftplayer, downplayer, frontplayer - 0.2) || mapcol(rightplayer, downplayer, frontplayer - 0.2)))
+		while ((savemap_->mapcol(leftplayer, downplayer, frontplayer - 0.2) || savemap_->mapcol(rightplayer, downplayer, frontplayer - 0.2)))
 		{
 			player_->OnMapCollisionZ();
 			frontplayer = player_->GetTranslation().z;
@@ -248,24 +262,24 @@ void GameScene::MapCollision()
 	///////
 
 	//右に仮想的に移動して当たったら
-	if (mapcol(rightCat + cat_->GetMoveSpeed(), downCat + cat_->GetSize() / 2, frontCat + 0.1) || mapcol(rightCat + cat_->GetMoveSpeed(), downCat + cat_->GetSize() / 2, backCat - 0.1) && cat_->GetMove().x > 0)
+	if (map_->mapcol(rightCat + cat_->GetMoveSpeed(), downCat + cat_->GetSize() / 2, frontCat + 0.1) || map_->mapcol(rightCat + cat_->GetMoveSpeed(), downCat + cat_->GetSize() / 2, backCat - 0.1) && cat_->GetMove().x > 0)
 	{
 		cat_->OnMapCollision();
 	}
 	//穴判定
-	else if (mapcol(rightCat + cat_->GetMoveSpeed(), downCat - cat_->GetSize() / 2, frontCat + 0.1) != BLOCK || mapcol(rightCat + cat_->GetMoveSpeed(), downCat - cat_->GetSize() / 2, backCat - 0.1) != BLOCK ) {
+	else if (map_->mapcol(rightCat + cat_->GetMoveSpeed(), downCat - cat_->GetSize() / 2, frontCat + 0.1) != BLOCK || map_->mapcol(rightCat + cat_->GetMoveSpeed(), downCat - cat_->GetSize() / 2, backCat - 0.1) != BLOCK ) {
 		if (cat_->GetMove().x > 0) {
 			cat_->OnMapCollision();
 		}
 	}
 
 	//左に仮想的に移動して当たったら
-	if (mapcol(leftCat - cat_->GetMoveSpeed(), downCat + cat_->GetSize() / 2, frontCat + 0.1) || mapcol(leftCat - cat_->GetMoveSpeed(), downCat + cat_->GetSize() / 2, backCat - 0.1) && cat_->GetMove().x < 0)
+	if (map_->mapcol(leftCat - cat_->GetMoveSpeed(), downCat + cat_->GetSize() / 2, frontCat + 0.1) || map_->mapcol(leftCat - cat_->GetMoveSpeed(), downCat + cat_->GetSize() / 2, backCat - 0.1) && cat_->GetMove().x < 0)
 	{
 		cat_->OnMapCollision();
 	}
 	//穴判定
-	else if (mapcol(leftCat - cat_->GetMoveSpeed() - blockSize, downCat - cat_->GetSize() / 2, frontCat + 0.1) != BLOCK || mapcol(leftCat - cat_->GetMoveSpeed() - blockSize, downCat - cat_->GetSize() / 2, backCat - 0.1) != BLOCK) {
+	else if (map_->mapcol(leftCat - cat_->GetMoveSpeed() - blockSize, downCat - cat_->GetSize() / 2, frontCat + 0.1) != BLOCK || map_->mapcol(leftCat - cat_->GetMoveSpeed() - blockSize, downCat - cat_->GetSize() / 2, backCat - 0.1) != BLOCK) {
 		if (cat_->GetMove().x < 0) {
 			cat_->OnMapCollision();
 		}
@@ -273,10 +287,10 @@ void GameScene::MapCollision()
 
 	////y軸に対しての当たり判定
 	////上に仮想的に移動して当たったら
-	//if (mapcol(left, up, front))
+	//if (map_->mapcol(left, up, front))
 	//{
 	//	//１ピクセル先に壁が来るまで移動
-	//	while ((mapcol(left, up, front)))
+	//	while ((map_->mapcol(left, up, front)))
 	//	{
 	//		player_->OnMapCollisionY2();
 	//		up = player_->GetTranslation().y - player_->GetSize();
@@ -285,10 +299,10 @@ void GameScene::MapCollision()
 	//}
 
 	////下に仮想的に移動して当たったら
-	//if (mapcol(leftCat, downCat, frontCat + 0.1))
+	//if (map_->mapcol(leftCat, downCat, frontCat + 0.1))
 	//{
 	//	//１ピクセル先に壁が来るまで移動
-	//	while ((mapcol(leftCat, downCat, frontCat + 0.1)))
+	//	while ((map_->mapcol(leftCat, downCat, frontCat + 0.1)))
 	//	{
 	//		upCat = cat_->GetTranslation().y - cat_->GetSize();
 	//		downCat = cat_->GetTranslation().y;
@@ -300,12 +314,12 @@ void GameScene::MapCollision()
 
 	//z軸に対しての当たり判定
 	//奥に仮想的に移動して当たったら
-	if (mapcol(leftCat+ 0.1, downCat + cat_->GetSize() / 2, backCat + cat_->GetMoveSpeed()) || mapcol(rightCat - 0.1, downCat + cat_->GetSize() / 2, backCat + cat_->GetMoveSpeed()) && cat_->GetMove().z > 0)
+	if (map_->mapcol(leftCat+ 0.1, downCat + cat_->GetSize() / 2, backCat + cat_->GetMoveSpeed()) || map_->mapcol(rightCat - 0.1, downCat + cat_->GetSize() / 2, backCat + cat_->GetMoveSpeed()) && cat_->GetMove().z > 0)
 	{
 		cat_->OnMapCollision();
 	}
 	//穴判定
-	else if (mapcol(leftCat + 0.1, downCat - cat_->GetSize() / 2, backCat + cat_->GetMoveSpeed()) != BLOCK || mapcol(rightCat - 0.1, downCat - cat_->GetSize() / 2, backCat + cat_->GetMoveSpeed()) != BLOCK ) {
+	else if (map_->mapcol(leftCat + 0.1, downCat - cat_->GetSize() / 2, backCat + cat_->GetMoveSpeed()) != BLOCK || map_->mapcol(rightCat - 0.1, downCat - cat_->GetSize() / 2, backCat + cat_->GetMoveSpeed()) != BLOCK ) {
 
 		if (cat_->GetMove().z > 0) {
 			cat_->OnMapCollision();
@@ -313,12 +327,12 @@ void GameScene::MapCollision()
 	}
 
 	//手前に仮想的に移動して当たったら
-	if (mapcol(leftCat + 0.1, downCat + cat_->GetSize() / 2, frontCat - cat_->GetMoveSpeed()) || mapcol(rightCat - 0.1, downCat + cat_->GetSize() / 2, frontCat - cat_->GetMoveSpeed()) && cat_->GetMove().z < 0)
+	if (map_->mapcol(leftCat + 0.1, downCat + cat_->GetSize() / 2, frontCat - cat_->GetMoveSpeed()) || map_->mapcol(rightCat - 0.1, downCat + cat_->GetSize() / 2, frontCat - cat_->GetMoveSpeed()) && cat_->GetMove().z < 0)
 	{
 		cat_->OnMapCollision();
 	}
 	//穴判定
-	else if (mapcol(leftCat + 0.1, downCat - cat_->GetSize() / 2, frontCat - cat_->GetMoveSpeed() - blockSize) != BLOCK || mapcol(rightCat- 0.1, downCat - cat_->GetSize() / 2, frontCat - cat_->GetMoveSpeed() - blockSize) != BLOCK) {
+	else if (map_->mapcol(leftCat + 0.1, downCat - cat_->GetSize() / 2, frontCat - cat_->GetMoveSpeed() - blockSize) != BLOCK || map_->mapcol(rightCat- 0.1, downCat - cat_->GetSize() / 2, frontCat - cat_->GetMoveSpeed() - blockSize) != BLOCK) {
 		if (cat_->GetMove().z < 0) {
 			cat_->OnMapCollision();
 		}

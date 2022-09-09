@@ -74,6 +74,12 @@ class GameScene {
 	//ネコ
 	std::unique_ptr<Cat> cat_;
 
+	//マップ
+	Map* map_=new Map;
+	Map* savemap_ = new Map;
+
+	Map* map[blockY][blockZ][blockX] = {};
+
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>

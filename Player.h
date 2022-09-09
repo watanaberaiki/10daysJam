@@ -18,7 +18,7 @@ class Player
 {
 public:
 	void Initialize(Model* model, uint32_t textureHandle);
-	void Update();
+	void Update(Map* map);
 	void Draw(ViewProjection viewProjection);
 	void Move();
 	void OnMapCollision();
@@ -43,13 +43,13 @@ public:
 public:
 
 	//ブロック関係の処理まとめ
-	void BlockManager();
+	void BlockManager(Map *map);
 
 	//ブロックになる処理
-	void BecomeBlock();
+	void BecomeBlock(Map *map);
 
 	//ブロックを解除する処理
-	void LiftBlock();
+	void LiftBlock(Map *map);
 
 	//位置取得
 	Vector3 PositionAcquisition();
@@ -65,11 +65,8 @@ private:
 
 	int downBlock = 0;
 
-
-	//map取得用
-	int map[blockY][blockZ][blockX] = {};
-
-	Map* map_ = nullptr;
+	////map取得用
+	//int map[blockY][blockZ][blockX] = {};
 
 	//↑
 

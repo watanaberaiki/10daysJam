@@ -20,13 +20,13 @@ void Player::Initialize(Model* model, uint32_t textureHandle)
 
 }
 
-void Player::Update()
+void Player::Update(Map *map)
 {
 	Move();
 	/*worldTransform_.translation_.y -= gravity;*/
 	worldTransformUpdate(&worldTransform_);
 
-	BlockManager();
+	BlockManager(map);
 
 }
 
@@ -128,7 +128,7 @@ void Player::MoveSpeedSet()
 }
 
 //ブロック関係の処理まとめ
-void Player::BlockManager() {
+void Player::BlockManager(Map *map) {
 
 	//ステージスタート時の初期化処理
 	if (block == 2) {
@@ -142,11 +142,10 @@ void Player::BlockManager() {
 			for (int j = 0; j < blockZ; j++)
 			{
 				for (int k = 0; k < blockX; k++) {
-					map[i][j][k] = startMap[i][j][k];
 
 					//プレイヤー位置初期化
 
-					if (map[i][j][k] == START) {
+					if (map->map[i][j][k] == START) {
 
 						worldTransform_.translation_.x = blockSize * k;
 						worldTransform_.translation_.y = blockSize * i;
@@ -165,7 +164,7 @@ void Player::BlockManager() {
 
 	if (block == 0) {
 		if (liftBlock == 0) {
-			LiftBlock();
+			LiftBlock(map);
 		}
 		else {
 			if (keyTimer >= keyCoolTime) {
@@ -180,7 +179,7 @@ void Player::BlockManager() {
 	}
 	else {
 		if (becomeBlock == 0) {
-			BecomeBlock();
+			BecomeBlock(map);
 		}
 		else {
 			if (keyTimer >= keyCoolTime) {
@@ -209,30 +208,38 @@ void Player::BlockManager() {
 }
 
 //ブロックになる処理
-void  Player::BecomeBlock() {
+void  Player::BecomeBlock(Map* map) {
 
 	becomeBlock = 1;
 
 	worldTransform_.translation_.x = (posNumX * blockSize);
 	worldTransform_.translation_.z = (posNumZ * blockSize);
 
-	if (map[0][posNumZ][posNumX] == BLUNK) {
+	if (map->map[0][posNumZ][posNumX] == BLUNK) {
 		downBlock = 1;
 		worldTransform_.translation_.y -= blockSize;
+		map->map[0][posNumZ][posNumX] = BLOCK;
 	}
-
-
+	else {
+		map->map[1][posNumZ][posNumX] = BLOCK;
+	}
 }
 
 //ブロックを解除する処理
-void Player::LiftBlock() {
+void Player::LiftBlock(Map *map) {
 
 	liftBlock = 1;
 
 	if (downBlock == 1) {
 		downBlock = 0;
 		worldTransform_.translation_.y += blockSize;
+
+		map->map[0][posNumZ][posNumX] = BLUNK;
 	}
+	else {
+		map->map[1][posNumZ][posNumX] = BLUNK;
+	}
+
 }
 
 //位置取得
