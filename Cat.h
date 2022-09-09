@@ -12,7 +12,7 @@
 #include "memory"
 #include "list"
 
-enum direction {
+enum class Direction {
 	front,		//前
 	right,		//右
 	back,		//後ろ
@@ -80,7 +80,7 @@ private:
 	float size = scale_ * 2.0f;
 
 	//方向
-	direction direction_ = direction::back;
+	Direction direction_ = Direction::back;
 
 	//方向チェック
 	int whichdirection = 2;

@@ -24,9 +24,6 @@ void Cat::Update() {
 	Move();
 
 	worldTransformUpdate(&worldTransform_);
-
-	debugText_->SetPos(20, 20);
-	debugText_->Printf("%d", whichdirection);
 }
 
 //ï`âÊèàóù
@@ -37,16 +34,16 @@ void Cat::Draw(ViewProjection viewProjection) {
 //à⁄ìÆ
 void Cat::Move() {
 
-	if (direction_ == direction::front) {
+	if (direction_ == Direction::front) {
 		move.z = -moveSpeed;
 	}
-	else if (direction_ == direction::right) {
+	else if (direction_ == Direction::right) {
 		move.x = moveSpeed;
 	}
-	else if (direction_ == direction::back) {
+	else if (direction_ == Direction::back) {
 		move.z = moveSpeed;
 	}
-	else if (direction_ == direction::left) {
+	else if (direction_ == Direction::left) {
 		move.x = -moveSpeed;
 	}
 	worldTransform_.translation_ += move;
@@ -55,26 +52,26 @@ void Cat::Move() {
 
 //ìñÇΩÇ¡ÇΩÇÁ
 void Cat::OnMapCollision() {
-	if (direction_ == direction::front) {
-		direction_ = direction::right;
+	if (direction_ == Direction::front) {
+		direction_ = Direction::right;
 		worldTransform_.translation_.z += 0.05;
 		move = { 0,0,0 };
 		whichdirection = 1;
 	}
-	else if (direction_ == direction::right) {
-		direction_ = direction::back;
+	else if (direction_ == Direction::right) {
+		direction_ = Direction::back;
 		worldTransform_.translation_.x -= 0.05;
 		move = { 0,0,0 };
 		whichdirection = 2;
 	}
-	else if (direction_ == direction::back) {
-		direction_ = direction::left;
+	else if (direction_ == Direction::back) {
+		direction_ = Direction::left;
 		worldTransform_.translation_.z -= 0.05;
 		move = { 0,0,0 };
 		whichdirection = 3;
 	}
-	else if (direction_ == direction::left) {
-		direction_ = direction::front;
+	else if (direction_ == Direction::left) {
+		direction_ = Direction::front;
 		worldTransform_.translation_.x += 0.05;
 		move = { 0,0,0 };
 		whichdirection = 0;

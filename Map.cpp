@@ -1,4 +1,5 @@
-#include "Map.h"
+ï»¿#include "Map.h"
+#include <cassert>
 
 bool mapcol(int x, int y, int z)
 {
@@ -6,10 +7,38 @@ bool mapcol(int x, int y, int z)
 	int mapy = y / (blockScale * blockSize);
 	int mapz = z / (blockScale * blockSize);
 
-	//‚ ‚è‚¦‚È‚¢’l‚Ífalse‚Å•Ô‚·
+	//ï¿½ï¿½ï¿½è‚¦ï¿½È‚ï¿½ï¿½lï¿½ï¿½falseï¿½Å•Ô‚ï¿½
 	if (mapx < 0 || mapx >= blockX)	return false;
 	if (mapy < 0 || mapy >= blockY)	return false;
 	if (mapz < 0 || mapz >= blockZ)	return false;
 
-	return Map[mapy][mapz][mapx] == BLOCK;
+	return startMap[mapy][mapz][mapx] == BLOCK;
 }
+
+void Map::Initialize() {
+	SetMap();
+}
+
+void Map::Update() {
+
+}
+
+void Map::SetMap() {
+
+	for (int i = 0; i < blockY; i++)
+	{
+		for (int j = 0; j < blockZ; j++)
+		{
+			for (int k = 0; k < blockX; k++) {
+				map[i][j][k] = startMap[i][j][k];
+			}
+		}
+	}
+
+}
+
+//void Map::GetMap(int mapx[]) {
+//
+//
+//
+//}

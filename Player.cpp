@@ -6,7 +6,9 @@ void Player::Initialize(Model* model, uint32_t textureHandle)
 	assert(model);
 
 	model_ = model;
-	textureHandle_ = textureHandle;
+	redTexture_ = TextureManager::Load("red.png");
+	blueTexture_ = TextureManager::Load("blue.png");
+
 
 	//シングルトンインスタンスを取得する
 	input_ = Input::GetInstance();
@@ -14,7 +16,8 @@ void Player::Initialize(Model* model, uint32_t textureHandle)
 
 	worldTransform_.Initialize();
 	worldTransform_.scale_ = { scale_,scale_,scale_ };
-	worldTransform_.translation_ = {0,10,0};
+	worldTransform_.translation_ = { 0,10,0 };
+
 }
 
 void Player::Update()
@@ -22,52 +25,69 @@ void Player::Update()
 	Move();
 	/*worldTransform_.translation_.y -= gravity;*/
 	worldTransformUpdate(&worldTransform_);
+
+	BlockManager();
+
 }
 
 void Player::Draw(ViewProjection viewProjection)
 {
-	model_->Draw(worldTransform_, viewProjection, textureHandle_);
+	if (becomeBlock == 1) {
+		model_->Draw(worldTransform_, viewProjection, redTexture_);
+	}
+	else
+	{
+		model_->Draw(worldTransform_, viewProjection, blueTexture_);
+	}
+
 }
 
 void Player::Move()
 {
-	//arowキーで移動
-	if (input_->PushKey(DIK_LEFT))
-	{
-		move.x = -mSpeed[0];
-	}
-	else if (input_->PushKey(DIK_RIGHT))
-	{
-		move.x = mSpeed[0];
-	}
-	else
-	{
-		move.x = 0;
-	}
-	if (input_->PushKey(DIK_DOWN))
-	{
-		move.z = -mSpeed[2];
-	}
-	else if (input_->PushKey(DIK_UP))
-	{
-		move.z = mSpeed[2];
-	}
-	else
-	{
-		move.z = 0;
-	}
 
-	
+	if (becomeBlock == 0) {
 
-	mSpeed[1] = -gravity;
-	move.y = mSpeed[1];
+		moveTimer++;
 
-	worldTransform_.translation_ += move;
+		if (moveTimer >= moveCoolTime) {
+
+			//arowキーで移動
+			if (input_->PushKey(DIK_LEFT))
+			{
+				move.x = -mSpeed[0];
+			}
+			else if (input_->PushKey(DIK_RIGHT))
+			{
+				move.x = mSpeed[0];
+			}
+			else
+			{
+				move.x = 0;
+			}
+			if (input_->PushKey(DIK_DOWN))
+			{
+				move.z = -mSpeed[2];
+			}
+			else if (input_->PushKey(DIK_UP))
+			{
+				move.z = mSpeed[2];
+			}
+			else
+			{
+				move.z = 0;
+			}
+			/*mSpeed[1] = -gravity;*/
+			//move.y = mSpeed[1];
+
+			worldTransform_.translation_ += move;
+			moveTimer = 0;
+		}
+
+	}
 }
 
 void Player::OnMapCollision()
 {
-
 }
 
 void Player::OnMapCollisionX()
@@ -93,7 +113,6 @@ void Player::OnMapCollisionX2()
 void Player::OnMapCollisionY2()
 {
 	worldTransform_.translation_.y -= 0.1;
-	
 }
 
 void Player::OnMapCollisionZ2()
@@ -108,3 +127,123 @@ void Player::MoveSpeedSet()
 	mSpeed[2] = moveSpeed;
 }
 
+//ブロック関係の処理まとめ
+void Player::BlockManager() {
+
+	//ステージスタート時の初期化処理
+	if (block == 2) {
+		block = 0;
+
+		//map_->SetMap();
+
+		//Map情報取得
+		for (int i = 0; i < blockY; i++)
+		{
+			for (int j = 0; j < blockZ; j++)
+			{
+				for (int k = 0; k < blockX; k++) {
+					map[i][j][k] = startMap[i][j][k];
+
+					//プレイヤー位置初期化
+
+					if (map[i][j][k] == START) {
+
+						worldTransform_.translation_.x = blockSize * k;
+						worldTransform_.translation_.y = blockSize * i;
+						worldTransform_.translation_.z = blockSize * j;
+
+					}
+				}
+			}
+		}
+
+
+
+	}
+
+	keyTimer++;
+
+	if (block == 0) {
+		if (liftBlock == 0) {
+			LiftBlock();
+		}
+		else {
+			if (keyTimer >= keyCoolTime) {
+				if (input_->PushKey(DIK_SPACE)) {
+					block = 1;
+					liftBlock = 0;
+					keyTimer = 0;
+
+				}
+			}
+		}
+	}
+	else {
+		if (becomeBlock == 0) {
+			BecomeBlock();
+		}
+		else {
+			if (keyTimer >= keyCoolTime) {
+				if (input_->PushKey(DIK_SPACE)) {
+					block = 0;
+					becomeBlock = 0;
+					keyTimer = 0;
+				}
+			}
+		}
+	}
+
+
+	posNum = PositionAcquisition();
+
+	posNumX = (posNum.x + 0.5);
+	posNumY = (posNum.y + 0.5);
+	posNumZ = (posNum.z + 0.5);
+
+	debugText_->SetPos(0, 20);
+	debugText_->Printf("%f,%f,%f", posNum.x, posNum.y, posNum.z);
+
+	debugText_->SetPos(0, 40);
+	debugText_->Printf("%d,%d,%d", posNumX, posNumY, posNumZ);
+
+}
+
+//ブロックになる処理
+void  Player::BecomeBlock() {
+
+	becomeBlock = 1;
+
+	worldTransform_.translation_.x = (posNumX * blockSize);
+	worldTransform_.translation_.z = (posNumZ * blockSize);
+
+	if (map[0][posNumZ][posNumX] == BLUNK) {
+		downBlock = 1;
+		worldTransform_.translation_.y -= blockSize;
+	}
+
+
+}
+
+//ブロックを解除する処理
+void Player::LiftBlock() {
+
+	liftBlock = 1;
+
+	if (downBlock == 1) {
+		downBlock = 0;
+		worldTransform_.translation_.y += blockSize;
+	}
+}
+
+//位置取得
+Vector3 Player::PositionAcquisition() {
+
+	//位置情報からマップチップの番号を算出	
+	Vector3 playerPosNum(0, 0, 0);
+
+	playerPosNum.x = worldTransform_.translation_.x / blockSize;
+	playerPosNum.y = worldTransform_.translation_.y / blockSize;
+	playerPosNum.z = worldTransform_.translation_.z / blockSize;
+
+	return playerPosNum;
+}
