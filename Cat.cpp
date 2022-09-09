@@ -16,6 +16,8 @@ void Cat::Initialize(Model* model, uint32_t textureHandle) {
 	worldTransform_.Initialize();
 	worldTransform_.scale_ = { scale_,scale_,scale_ };
 
+	worldTransform_.translation_ = { 4,2,0 };
+
 }
 
 //更新処理
@@ -23,6 +25,10 @@ void Cat::Update() {
 	Move();
 
 	worldTransformUpdate(&worldTransform_);
+
+
+	debugText_->SetPos(0, 20);
+	debugText_->Printf("%f,%f,%f", worldTransform_.translation_.x, worldTransform_.translation_.y, worldTransform_.translation_.z);
 }
 
 //描画処理
@@ -82,7 +88,7 @@ void Cat::FastSpeed() {
 }
 
 void Cat::Restore() {
-	moveSpeed = 0.05;
+	moveSpeed = 0.03;
 }
 
 void Cat::Pause() {
@@ -100,32 +106,32 @@ void Cat::MapSet(Map* map) {
 				//プレイヤー位置初期化
 
 				if (map->map[i][j][k] == CATUP) {
-					direction_ = Direction::back;
+
 					worldTransform_.translation_.x = blockSize * k;
 					worldTransform_.translation_.y = blockSize * i;
 					worldTransform_.translation_.z = blockSize * j;
-
+					direction_ = Direction::back;
 				}
 				if (map->map[i][j][k] == CATLEFT) {
-					direction_ = Direction::left;
+
 					worldTransform_.translation_.x = blockSize * k;
 					worldTransform_.translation_.y = blockSize * i;
 					worldTransform_.translation_.z = blockSize * j;
-
+					direction_ = Direction::left;
 				}
 				if (map->map[i][j][k] == CATRIGHT) {
-					direction_ = Direction::right;
+
 					worldTransform_.translation_.x = blockSize * k;
 					worldTransform_.translation_.y = blockSize * i;
 					worldTransform_.translation_.z = blockSize * j;
-
+					direction_ = Direction::right;
 				}
 				if (map->map[i][j][k] == CATDOWN) {
-					direction_ = Direction::front;
+
 					worldTransform_.translation_.x = blockSize * k;
 					worldTransform_.translation_.y = blockSize * i;
 					worldTransform_.translation_.z = blockSize * j;
-
+					direction_ = Direction::front;
 				}
 			}
 		}

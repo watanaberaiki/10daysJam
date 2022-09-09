@@ -47,13 +47,14 @@ public:
 	//元に戻す
 	void Restore();
 
-	void MapSet(Map *map);
+	void MapSet(Map* map);
 
 	//ゲッター
 	Vector3 GetTranslation() { return worldTransform_.translation_; }
 	Vector3 GetMove() { return move; }
 	float GetSize() { return size; }
 	float GetMoveSpeed() { return moveSpeed; }
+	Direction GetDirection() { return direction_; }
 
 private:
 	//ワールドトランスフォーム
@@ -73,17 +74,14 @@ private:
 	Vector3 roll = { 0,0,0 };
 	Vector3 scale = { 0,0,0 };
 	//速度
-	float moveSpeed = 0.01;
-
-
-	float gravity = 0.1;
+	float moveSpeed;
 
 	//プレイヤーの大きさ	倍率をいじる
 	float scale_ = 0.8f;
 	float size = scale_ * 2.0f;
 
 	//方向
-	Direction direction_;
+	Direction direction_=Direction::back;
 
 	//方向チェック
 	int whichdirection = 2;
