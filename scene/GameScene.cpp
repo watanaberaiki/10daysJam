@@ -71,8 +71,10 @@ void GameScene::Initialize() {
 	}
 
 	//クリア画像の読み込み
-	textureHandleClear_ = TextureManager::Load("clear.png");
+	textureHandleClear_ = TextureManager::Load("clere.png");
 	stageClear_ = Sprite::Create(textureHandleClear_, { 0, 0 });
+	stageClear_->Sprite::SetPosition(Vector2(340,160));
+	stageClear_->SetSize(Vector2(640, 260));
 
 	//ステージセレクト用のモデルの座標の初期化
 
