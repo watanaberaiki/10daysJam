@@ -15,6 +15,7 @@
 #include "Player.h"
 #include "Map.h"
 #include "Cat.h"
+#include "Goal.h"
 
 /// <summary>
 /// ゲームシーン
@@ -73,6 +74,10 @@ class GameScene {
 
 	//ネコ
 	std::unique_ptr<Cat> cat_;
+
+	//ゴール
+	std::unique_ptr<Goal> goal_;
+	int isgoal = 0;
 
 	//マップ
 	Map* map_=new Map;

@@ -37,6 +37,12 @@ void GameScene::Initialize() {
 	newCat->Initialize(model_, textureHandle_);
 	cat_.reset(newCat);
 
+	//ゴール
+	Goal* newGoal = new Goal();
+	newGoal->Initialize(model_, textureHandle_);
+	goal_.reset(newGoal);
+
+
 	map_->Loding("map1.csv");
 	savemap_->Loding("map1.csv");
 
@@ -62,6 +68,9 @@ void GameScene::Update()
 	//プレイヤー
 	player_->Update(map_);
 
+	//ゴール
+	goal_->Update();
+
 	//デバッグカメラ
 	debugCamera_->Update();
 
@@ -78,8 +87,19 @@ void GameScene::Update()
 	cat_->Update();
 
 
-	/*if (input_->PushKey(DIK_RETURN)) {
+	if (input_->PushKey(DIK_RETURN)) {
+		map_->Loding("map1.csv");
+		savemap_->Loding("map1.csv");
 		cat_->MapSet(map_);
+		goal_->MapSet(map_);
+	}
+
+
+	debugText_->SetPos(0, 100);
+	debugText_->Printf("%d",isgoal);
+
+	/*if (input_->PushKey(DIK_RETURN)) {
+
 	}*/
 
 
@@ -132,6 +152,8 @@ void GameScene::Draw() {
 	player_->Draw(debugCamera_->GetViewProjection());
 
 	cat_->Draw(debugCamera_->GetViewProjection());
+
+	goal_->Draw(debugCamera_->GetViewProjection());
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 #pragma endregion
@@ -165,11 +187,12 @@ void GameScene::MapCollision()
 	float upplayer = player_->GetTranslation().y - player_->GetSize();
 	float backplayer = player_->GetTranslation().z + player_->GetSize();
 
+
 	float leftCat = cat_->GetTranslation().x;
-	float downCat = cat_->GetTranslation().y ;
+	float downCat = cat_->GetTranslation().y;
 	float frontCat = cat_->GetTranslation().z;
 	float rightCat = cat_->GetTranslation().x + cat_->GetSize();
-	float upCat = cat_->GetTranslation().y- cat_->GetSize();
+	float upCat = cat_->GetTranslation().y - cat_->GetSize();
 	float backCat = cat_->GetTranslation().z + cat_->GetSize();
 
 	player_->MoveSpeedSet();
@@ -280,18 +303,25 @@ void GameScene::MapCollision()
 	}
 
 	//左に仮想的に移動して当たったら
-	if (map_->mapcol(leftCat - cat_->GetMoveSpeed(), downCat + cat_->GetSize() / 2, frontCat + 0.1) || map_->mapcol(leftCat - cat_->GetMoveSpeed(), downCat + cat_->GetSize() / 2, backCat - 0.1) )
+	if (map_->mapcol(leftCat - cat_->GetMoveSpeed(), downCat + cat_->GetSize() / 2, frontCat + 0.1) || map_->mapcol(leftCat - cat_->GetMoveSpeed(), downCat + cat_->GetSize() / 2, backCat - 0.1))
 	{
 		if (cat_->GetDirection() == Direction::left) {
 			cat_->OnMapCollision();
 		}
 	}
 	//穴判定
-	else if (map_->mapcol(leftCat - cat_->GetMoveSpeed() - blockSize, downCat - cat_->GetSize() / 2, frontCat + 0.1) != BLOCK || map_->mapcol(leftCat - cat_->GetMoveSpeed() - blockSize, downCat - cat_->GetSize() / 2, backCat - 0.1) != BLOCK) {
-		if (cat_->GetDirection() == Direction::left) {
-			cat_->OnMapCollision();
+	else if (map_->mapcol(leftCat - cat_->GetMoveSpeed() - blockSize, downCat - cat_->GetSize() / 2, frontCat + 0.1) == BLOCK || map_->mapcol(leftCat - cat_->GetMoveSpeed() - blockSize, downCat - cat_->GetSize() / 2, backCat - 0.1) == BLOCK) {
+
+		if (map_->mapcol(leftCat - cat_->GetMoveSpeed(), downCat - cat_->GetSize() / 2, frontCat + 0.1) != BLOCK || map_->mapcol(leftCat - cat_->GetMoveSpeed(), downCat - cat_->GetSize() / 2, backCat - 0.1) != BLOCK) {
+
+			if (cat_->GetDirection() == Direction::left) {
+				cat_->OnMapCollision();
+			}
 		}
 	}
+
+
+
 
 	////y軸に対しての当たり判定
 	////上に仮想的に移動して当たったら
@@ -344,9 +374,22 @@ void GameScene::MapCollision()
 		}
 	}
 	//穴判定
-	else if (map_->mapcol(leftCat + 0.1, downCat - cat_->GetSize() / 2, frontCat - cat_->GetMoveSpeed()) != BLOCK || map_->mapcol(rightCat - 0.1, downCat - cat_->GetSize() / 2, frontCat - cat_->GetMoveSpeed()) != BLOCK) {
-		if (cat_->GetDirection() == Direction::front) {
-			cat_->OnMapCollision();
+	else if (map_->mapcol(leftCat + 0.1, downCat - cat_->GetSize() / 2, frontCat - cat_->GetMoveSpeed() - blockSize) == BLOCK || map_->mapcol(rightCat - 0.1, downCat - cat_->GetSize() / 2, frontCat - cat_->GetMoveSpeed() - blockSize) == BLOCK) {
+
+		if (map_->mapcol(leftCat + 0.1, downCat - cat_->GetSize() / 2, frontCat - cat_->GetMoveSpeed()) != BLOCK || map_->mapcol(rightCat - 0.1, downCat - cat_->GetSize() / 2, frontCat - cat_->GetMoveSpeed()) != BLOCK) {
+
+			if (cat_->GetDirection() == Direction::front) {
+				cat_->OnMapCollision();
+			}
+		}
+	}
+
+	//ゴール判定
+	if (leftCat) {
+		if (goal_->GetTranslation().x - 1 < cat_->GetTranslation().x + (cat_->GetSize() / 2) && cat_->GetTranslation().x - (cat_->GetSize() / 2) < goal_->GetTranslation().x + 1) {
+			if (goal_->GetTranslation().z - 1 < cat_->GetTranslation().z + (cat_->GetSize() / 2) && cat_->GetTranslation().z - (cat_->GetSize() / 2) < goal_->GetTranslation().z + 1) {
+				isgoal = 1;
+			}
 		}
 	}
 }

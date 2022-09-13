@@ -31,6 +31,7 @@ void Cat::Update() {
 	debugText_->Printf("%f,%f,%f", worldTransform_.translation_.x, worldTransform_.translation_.y, worldTransform_.translation_.z);
 }
 
+
 //•`‰æˆ—
 void Cat::Draw(ViewProjection viewProjection) {
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
@@ -38,6 +39,15 @@ void Cat::Draw(ViewProjection viewProjection) {
 
 //ˆÚ“®
 void Cat::Move() {
+
+
+	if (direction_ == Direction::front&&worldTransform_.translation_.z<=0) {
+		OnMapCollision();
+	}
+
+	if (direction_ == Direction::left && worldTransform_.translation_.x <= 0) {
+		OnMapCollision();
+	}
 
 	if (direction_ == Direction::front) {
 		move.z = -moveSpeed;
@@ -52,6 +62,9 @@ void Cat::Move() {
 		move.x = -moveSpeed;
 	}
 	worldTransform_.translation_ += move;
+
+
+
 
 }
 
@@ -110,6 +123,7 @@ void Cat::MapSet(Map* map) {
 					worldTransform_.translation_.x = blockSize * k;
 					worldTransform_.translation_.y = blockSize * i;
 					worldTransform_.translation_.z = blockSize * j;
+					move = { 0,0,0 };
 					direction_ = Direction::back;
 				}
 				if (map->map[i][j][k] == CATLEFT) {
@@ -117,6 +131,7 @@ void Cat::MapSet(Map* map) {
 					worldTransform_.translation_.x = blockSize * k;
 					worldTransform_.translation_.y = blockSize * i;
 					worldTransform_.translation_.z = blockSize * j;
+					move = { 0,0,0 };
 					direction_ = Direction::left;
 				}
 				if (map->map[i][j][k] == CATRIGHT) {
@@ -124,6 +139,7 @@ void Cat::MapSet(Map* map) {
 					worldTransform_.translation_.x = blockSize * k;
 					worldTransform_.translation_.y = blockSize * i;
 					worldTransform_.translation_.z = blockSize * j;
+					move = { 0,0,0 };
 					direction_ = Direction::right;
 				}
 				if (map->map[i][j][k] == CATDOWN) {
@@ -131,6 +147,7 @@ void Cat::MapSet(Map* map) {
 					worldTransform_.translation_.x = blockSize * k;
 					worldTransform_.translation_.y = blockSize * i;
 					worldTransform_.translation_.z = blockSize * j;
+					move = { 0,0,0 };
 					direction_ = Direction::front;
 				}
 			}

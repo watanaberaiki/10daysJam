@@ -47,6 +47,7 @@ public:
 	//元に戻す
 	void Restore();
 
+	//マップセット
 	void MapSet(Map* map);
 
 	//ゲッター
