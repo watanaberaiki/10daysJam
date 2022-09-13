@@ -158,6 +158,7 @@ private: // メンバ変数
 
 	//ゴール
 	std::unique_ptr<Goal> goal_;
+	Model* modelGoal_;
 	int isgoal = 0;
 
 	//天球

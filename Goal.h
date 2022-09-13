@@ -17,7 +17,7 @@ class Goal
 {
 public:
 	//初期化
-	void Initialize(Model* model, uint32_t textureHandle);
+	void Initialize(Model* model);
 
 	//描画処理
 	void Draw(ViewProjection viewProjection);
@@ -37,8 +37,6 @@ private:
 	WorldTransform worldTransform_;
 	//モデル
 	Model* model_ = nullptr;
-	//テクスチャ
-	uint32_t textureHandle_ = 0u;
 
 	Input* input_ = nullptr;
 

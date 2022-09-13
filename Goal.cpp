@@ -3,17 +3,18 @@
 
 
 //初期化
-void Goal::Initialize(Model* model, uint32_t textureHandle) {
+void Goal::Initialize(Model* model) {
 	assert(model);
 
 	model_ = model;
-	textureHandle_ = textureHandle;
 
 	//シングルトンインスタンスを取得する
 	input_ = Input::GetInstance();
 	debugText_ = DebugText::GetInstance();
 
 	worldTransform_.Initialize();
+	worldTransform_.translation_ = { 0, 0,-1 };
+	worldTransform_.scale_ = { 1,1,1 };
 }
 
 //更新
@@ -23,7 +24,7 @@ void Goal::Update() {
 
 //描画処理
 void  Goal::Draw(ViewProjection viewProjection) {
-	model_->Draw(worldTransform_, viewProjection, textureHandle_);
+	model_->Draw(worldTransform_, viewProjection);
 }
 
 //マップセット

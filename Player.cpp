@@ -6,9 +6,9 @@ void Player::Initialize(Model* model, uint32_t textureHandle, Map* map, Map* sav
 	assert(model);
 
 	model_ = model;
-	redTexture_ = TextureManager::Load("red.png");
-	blueTexture_ = TextureManager::Load("blue.png");
-	blackTexture_ = TextureManager::Load("black.png");
+	redTexture_ = TextureManager::Load("blockafter.png");
+	blueTexture_ = TextureManager::Load("blockbefore.png");
+	blackTexture_ = TextureManager::Load("blockcollision.png");
 
 	//シングルトンインスタンスを取得する
 	input_ = Input::GetInstance();

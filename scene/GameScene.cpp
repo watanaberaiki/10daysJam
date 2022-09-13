@@ -107,8 +107,9 @@ void GameScene::Initialize() {
 	skydome_.reset(newSkydome);
 
 	//ゴール
+	modelGoal_ = Model::CreateFromOBJ("homered", true);
 	Goal* newGoal = new Goal();
-	newGoal->Initialize(model_, textureHandle_);
+	newGoal->Initialize(modelGoal_);
 	goal_.reset(newGoal);
 
 
@@ -341,6 +342,9 @@ void GameScene::Select()
 	if (input_->TriggerKey(DIK_SPACE)) {
 		scene_ = static_cast<size_t>(Scene::Game);
 	}
+
+	debugText_->SetPos(0, 20);
+	debugText_->Printf("%d,%d",oldStage_,stage_);
 }
 //ステージセレクト画面の描画
 void GameScene::SelectDraw()
@@ -412,6 +416,8 @@ void GameScene::Game()
 	//Rでセレクト画面へ戻る
 	if (input_->TriggerKey(DIK_R)) {
 		scene_ = static_cast<size_t>(Scene::Select);
+		oldStage_ = 0;
+		stage_ = 1;
 		isgoal = 0;
 	}
 }
