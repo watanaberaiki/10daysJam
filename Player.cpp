@@ -1,14 +1,14 @@
 #include "Player.h"
 #include <cassert>
 
-void Player::Initialize(Model* model, uint32_t textureHandle)
+void Player::Initialize(Model* model, uint32_t textureHandle, Map* map, Map* savemap)
 {
 	assert(model);
 
 	model_ = model;
 	redTexture_ = TextureManager::Load("red.png");
 	blueTexture_ = TextureManager::Load("blue.png");
-
+	blackTexture_ = TextureManager::Load("black.png");
 
 	//シングルトンインスタンスを取得する
 	input_ = Input::GetInstance();
@@ -18,9 +18,11 @@ void Player::Initialize(Model* model, uint32_t textureHandle)
 	worldTransform_.scale_ = { scale_,scale_,scale_ };
 	worldTransform_.translation_ = { 0,10,0 };
 
+	ReSet(map, savemap);
+
 }
 
-void Player::Update(Map *map)
+void Player::Update(Map* map)
 {
 	Move();
 	/*worldTransform_.translation_.y -= gravity;*/
@@ -35,9 +37,12 @@ void Player::Draw(ViewProjection viewProjection)
 	if (becomeBlock == 1) {
 		model_->Draw(worldTransform_, viewProjection, redTexture_);
 	}
-	else
+	else if (becomeBlock == 0 && rockBlock == 0)
 	{
 		model_->Draw(worldTransform_, viewProjection, blueTexture_);
+	}
+	else {
+		model_->Draw(worldTransform_, viewProjection, blackTexture_);
 	}
 
 }
@@ -52,11 +57,11 @@ void Player::Move()
 		if (moveTimer >= moveCoolTime) {
 
 			//arowキーで移動
-			if (input_->PushKey(DIK_LEFT))
+			if (input_->PushKey(DIK_LEFT) && worldTransform_.translation_.x >= 0)
 			{
 				move.x = -mSpeed[0];
 			}
-			else if (input_->PushKey(DIK_RIGHT))
+			else if (input_->PushKey(DIK_RIGHT) && worldTransform_.translation_.x <= 18)
 			{
 				move.x = mSpeed[0];
 			}
@@ -64,11 +69,11 @@ void Player::Move()
 			{
 				move.x = 0;
 			}
-			if (input_->PushKey(DIK_DOWN))
+			if (input_->PushKey(DIK_DOWN) && worldTransform_.translation_.z >= 0)
 			{
 				move.z = -mSpeed[2];
 			}
-			else if (input_->PushKey(DIK_UP))
+			else if (input_->PushKey(DIK_UP) && worldTransform_.translation_.z <= 18)
 			{
 				move.z = mSpeed[2];
 			}
@@ -128,37 +133,15 @@ void Player::MoveSpeedSet()
 }
 
 //ブロック関係の処理まとめ
-void Player::BlockManager(Map *map) {
+void Player::BlockManager(Map* map) {
 
 	//ステージスタート時の初期化処理
-	if (block == 2) {
-		block = 0;
+	//if (block == 2) {
+	//	
+	//	ReSet(map);
 
-		//map_->SetMap();
-
-		//Map情報取得
-		for (int i = 0; i < blockY; i++)
-		{
-			for (int j = 0; j < blockZ; j++)
-			{
-				for (int k = 0; k < blockX; k++) {
-
-					//プレイヤー位置初期化
-
-					if (map->map[i][j][k] == PLAYER) {
-
-						worldTransform_.translation_.x = blockSize * k;
-						worldTransform_.translation_.y = blockSize * i;
-						worldTransform_.translation_.z = blockSize * j;
-
-					}
-				}
-			}
-		}
-
-
-
-	}
+	//	block = 0;
+	//}
 
 	keyTimer++;
 
@@ -167,7 +150,7 @@ void Player::BlockManager(Map *map) {
 			LiftBlock(map);
 		}
 		else {
-			if (keyTimer >= keyCoolTime) {
+			if (keyTimer >= keyCoolTime && rockBlock == 0) {
 				if (input_->PushKey(DIK_SPACE)) {
 					block = 1;
 					liftBlock = 0;
@@ -182,7 +165,7 @@ void Player::BlockManager(Map *map) {
 			BecomeBlock(map);
 		}
 		else {
-			if (keyTimer >= keyCoolTime) {
+			if (keyTimer >= keyCoolTime && rockBlock == 0) {
 				if (input_->PushKey(DIK_SPACE)) {
 					block = 0;
 					becomeBlock = 0;
@@ -199,11 +182,14 @@ void Player::BlockManager(Map *map) {
 	posNumY = (posNum.y + 0.5);
 	posNumZ = (posNum.z + 0.5);
 
-	debugText_->SetPos(0, 60);
+	debugText_->SetPos(0, 20);
 	debugText_->Printf("%f,%f,%f", posNum.x, posNum.y, posNum.z);
 
-	debugText_->SetPos(0, 80);
+	debugText_->SetPos(0, 40);
 	debugText_->Printf("%d,%d,%d", posNumX, posNumY, posNumZ);
+
+	//debugText_->SetPos(0, 60);
+	//debugText_->Printf("%d",rockBlock);
 
 }
 
@@ -226,7 +212,7 @@ void  Player::BecomeBlock(Map* map) {
 }
 
 //ブロックを解除する処理
-void Player::LiftBlock(Map *map) {
+void Player::LiftBlock(Map* map) {
 
 	liftBlock = 1;
 
@@ -253,4 +239,59 @@ Vector3 Player::PositionAcquisition() {
 	playerPosNum.z = worldTransform_.translation_.z / blockSize;
 
 	return playerPosNum;
+}
+
+void Player::RockBecomeBlock() {
+	rockBlock = 1;
+}
+
+void Player::RockLiftBlock() {
+	rockBlock = 0;
+}
+
+Vector3 Player::GetPosNum() {
+	return Vector3(posNumX, posNumY, posNumZ);
+}
+
+void Player::ReSet(Map* map, Map* savemap) {
+
+	if (becomeBlock) {
+		if (downBlock == 1) {
+			map->map[0][posNumZ][posNumX] = BLUNK;
+		}
+		else {
+			map->map[1][posNumZ][posNumX] = BLUNK;
+		}
+	}
+
+	block = 0;
+	becomeBlock = 0;
+	liftBlock = 1;
+	downBlock = 0;
+
+	rockBlock = 0;
+	keyTimer = 0;
+
+	//map_->SetMap();
+
+	//Map情報取得
+	for (int i = 0; i < blockY; i++)
+	{
+		for (int j = 0; j < blockZ; j++)
+		{
+			for (int k = 0; k < blockX; k++) {
+
+				//プレイヤー位置初期化
+
+				if (savemap->map[i][j][k] == PLAYER) {
+
+					worldTransform_.translation_.x = blockSize * k;
+					worldTransform_.translation_.y = blockSize * i;
+					worldTransform_.translation_.z = blockSize * j;
+
+				}
+			}
+		}
+	}
+
 }

@@ -51,64 +51,34 @@ void Map::Loding(char const* _FileName)
 	fclose(fp);
 }
 
-void Map::LodingSave(char const* _FileName)
+void Map::LodingSave(int stage)
 {
-	FILE* fp = NULL;
-
-	fopen_s(&fp, _FileName, "r");
-
-	//�z��p�̕ϐ�
-	int i, j, k;
-	i = 0; j = 0; k = 0;
-	//���
-	while (i < blockY && j < blockZ && k < blockX) {
-		fscanf_s(fp, "%d,", &savemap[i][j][k]);
-		if (k < blockX - 1)
-		{
-			k++;
-		}
-		else if (j < blockZ - 1)
-		{
-			k = 0;
-			j++;
-		}
-		else
-		{
-			k = 0;
-			j = 0;
-			i++;
-		}
+	if (stage == 1)
+	{
+		Loding("map/tutorialBlock .csv");
 	}
-
-
-	fclose(fp);
+	if (stage == 2)
+	{
+		Loding("map/tutorialHole.csv");
+	}
+	if (stage == 3)
+	{
+		Loding("map/stage1.csv");
+	}
+	if (stage == 4)
+	{
+		Loding("map/stage2.csv");
+	}
+	if (stage == 5)
+	{
+		Loding("map/stage3.csv");
+	}
+	if (stage == 6)
+	{
+		Loding("map/stage4.csv");
+	}
 }
 
-void Map::Update() {
+void Map::Update(int stage) {
 
 }
-
-//void Map::SetMap(int stage) {
-//
-//	for (int i = 0; i < blockY; i++)
-//	{
-//		for (int j = 0; j < blockZ; j++)
-//		{
-//			for (int k = 0; k < blockX; k++) 
-//			{
-//				map[i][j][k] = startMap[i][j][k];
-//			}
-//		}
-//	}
-//
-//}
-//
-//int Map::GetMap(int x,int y,int z) {
-//	return startMap[y][z][x];
-//}
-
-//int Map::dist(int y, int z, int x) {
-//
-//	return map[y][z][x];
-//
-//}

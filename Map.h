@@ -36,7 +36,7 @@ public:
 
 	void Initialize();
 
-	void Update();
+	void Update(int stage);
 
 	////ステージのマップをセットする
 	//void SetMap(int stage);
@@ -45,45 +45,16 @@ public:
 	//int GetMap(int x,int y, int z);
 
 	void Loding(char const* _FileName);
-	void LodingSave(char const* _FileName);
+	//どのマップを読み込むかを管理
+	void LodingSave(int stage);
 
 
-bool mapcol(int x, int y, int z);
+	bool mapcol(int x, int y, int z);
 
-int dist(int x,int y,int z);
+	int dist(int x, int y, int z);
 
 public:
 
- int map[blockY][blockZ][blockX];
- int savemap[blockY][blockZ][blockX];
-
+	int map[blockY][blockZ][blockX];
+	int savemap[blockY][blockZ][blockX];
 };
-
-
-//static int startMap[blockY][blockZ][blockX]
-//{
-//	{
-//		{1,1,1,1,1,1,1,1,1,1},
-//		{1,1,1,1,1,1,1,1,1,1},
-//		{1,1,1,1,1,1,1,1,1,1},
-//		{1,1,1,1,1,1,1,1,1,1},
-//		{1,1,1,1,1,1,1,1,1,1},
-//		{1,1,1,1,1,1,1,1,1,1},
-//		{1,1,1,1,1,1,1,1,1,1},
-//		{1,1,1,1,1,1,1,0,1,1},
-//		{1,1,1,1,1,1,1,1,1,1},
-//		{1,1,1,1,1,1,1,1,1,1}
-//	},
-//	{
-//		{2,0,0,0,0,0,0,0,0,0},
-//		{0,0,0,0,0,0,0,0,0,0},
-//		{0,0,1,1,1,1,1,1,0,0},
-//		{0,0,0,0,0,0,0,0,0,0},
-//		{0,0,0,0,0,0,0,0,0,0},
-//		{0,0,0,0,0,0,0,0,0,0},
-//		{1,0,0,0,0,0,0,0,0,0},
-//		{0,0,0,0,0,0,0,0,0,0},
-//		{0,0,0,0,0,0,0,0,0,0},
-//		{0,0,0,0,0,0,0,0,0,0}
-//	},
-//};

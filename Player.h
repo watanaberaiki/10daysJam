@@ -17,7 +17,7 @@
 class Player
 {
 public:
-	void Initialize(Model* model, uint32_t textureHandle);
+	void Initialize(Model* model, uint32_t textureHandle, Map* map, Map* savemap);
 	void Update(Map* map);
 	void Draw(ViewProjection viewProjection);
 	void Move();
@@ -35,6 +35,7 @@ public:
 	void MoveStopZ() { mSpeed[2] = 0.0f; };
 
 	//ゲッター
+	WorldTransform GetWorldTransform() { return worldTransform_; }
 	Vector3 GetTranslation() { return worldTransform_.translation_; }
 	Vector3 GetMove() { return move; }
 	float GetSize() { return size; }
@@ -43,27 +44,37 @@ public:
 public:
 
 	//ブロック関係の処理まとめ
-	void BlockManager(Map *map);
+	void BlockManager(Map* map);
 
 	//ブロックになる処理
-	void BecomeBlock(Map *map);
+	void BecomeBlock(Map* map);
 
 	//ブロックを解除する処理
-	void LiftBlock(Map *map);
+	void LiftBlock(Map* map);
 
 	//位置取得
 	Vector3 PositionAcquisition();
 
+	void RockBecomeBlock();
+	void RockLiftBlock();
+
+	Vector3 GetPosNum();
+
+	void ReSet(Map* map, Map* savemap);
+
 private:
 
 	//ブロック化しているか 0,してない　1,してる 2,ステージ変更時の初期化処理
-	int block = 2;
+	int block = 0;
 
 	//flag 通ったか
 	int becomeBlock = 0;
 	int liftBlock = 0;
 
+	//　ブロックが下に下がっているか
 	int downBlock = 0;
+	//　ブロック化出来るか出来ないか 0出来る 1出来ない
+	int rockBlock = 0;
 
 	////map取得用
 	//int map[blockY][blockZ][blockX] = {};
@@ -76,6 +87,7 @@ private:
 	uint32_t textureHandle_ = 0u;
 	uint32_t redTexture_ = 0u;
 	uint32_t blueTexture_ = 0u;
+	uint32_t blackTexture_ = 0u;
 
 	Input* input_ = nullptr;
 	DebugText* debugText_ = nullptr;
