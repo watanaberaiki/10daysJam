@@ -24,7 +24,7 @@ class Cat
 {
 public:
 	//初期化
-	void Initialize(Model* model, uint32_t textureHandle);
+	void Initialize(Model* model, Model* model2, Model* model3);
 	
 	//更新処理
 	void Update();
@@ -50,6 +50,9 @@ public:
 	//マップセット
 	void MapSet(Map* map);
 
+	//度数化
+	float GetDegree(float r);
+
 	//ゲッター
 	Vector3 GetTranslation() { return worldTransform_.translation_; }
 	Vector3 GetMove() { return move; }
@@ -62,8 +65,13 @@ private:
 	WorldTransform worldTransform_;
 	//モデル
 	Model* model_ = nullptr;
+	Model* modelWalk_ = nullptr;
+	Model* modelWalk2_ = nullptr;
+
+	int modelChengeTimer_ = 0;
+	int modelChengeTime_ = 10;
+	int modelChenge = 0;
 	//テクスチャ
-	uint32_t textureHandle_ = 0u;
 	
 	Input* input_ = nullptr;
 	

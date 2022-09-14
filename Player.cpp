@@ -6,9 +6,10 @@ void Player::Initialize(Model* model, uint32_t textureHandle, Map* map, Map* sav
 	assert(model);
 
 	model_ = model;
-	redTexture_ = TextureManager::Load("blockafter.png");
-	blueTexture_ = TextureManager::Load("blockbefore.png");
-	blackTexture_ = TextureManager::Load("blockcollision.png");
+	blockAfterwallTexture_ = TextureManager::Load("blockafter.png");
+	blockBeforeTexture_ = TextureManager::Load("blockbefore.png");
+	blockCollisionTexture_ = TextureManager::Load("blockcollision.png");
+	blockGroundTexture_= TextureManager::Load("blockafterground.png");
 
 	//シングルトンインスタンスを取得する
 	input_ = Input::GetInstance();
@@ -35,14 +36,19 @@ void Player::Update(Map* map)
 void Player::Draw(ViewProjection viewProjection)
 {
 	if (becomeBlock == 1) {
-		model_->Draw(worldTransform_, viewProjection, redTexture_);
+		if (downBlock == 0) {
+			model_->Draw(worldTransform_, viewProjection, blockAfterwallTexture_);
+		}
+		else {
+			model_->Draw(worldTransform_, viewProjection, blockGroundTexture_);
+		}
 	}
 	else if (becomeBlock == 0 && rockBlock == 0)
 	{
-		model_->Draw(worldTransform_, viewProjection, blueTexture_);
+		model_->Draw(worldTransform_, viewProjection, blockBeforeTexture_);
 	}
 	else {
-		model_->Draw(worldTransform_, viewProjection, blackTexture_);
+		model_->Draw(worldTransform_, viewProjection, blockCollisionTexture_);
 	}
 
 }

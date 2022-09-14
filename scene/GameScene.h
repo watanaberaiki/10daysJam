@@ -19,6 +19,8 @@
 #include "RailCamera.h"
 #include "Goal.h"
 #include "Skydome.h"
+#include "Tutorial.h"
+
 
 /// <summary>
 /// ゲームシーン
@@ -92,6 +94,9 @@ private: // メンバ変数
 
 	//ネコ
 	std::unique_ptr<Cat> cat_;
+	Model* modelCat_;
+	Model* modelCatWalk_;
+	Model* modelCatWalkReverse_;
 
 	//マップ
 	Map* map_ = new Map;
@@ -164,4 +169,6 @@ private: // メンバ変数
 	//天球
 	std::unique_ptr<Skydome>skydome_;
 	Model* modelSkydome_;
+
+	Tutorial* tutorial_;
 };

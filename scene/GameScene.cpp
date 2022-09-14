@@ -32,7 +32,7 @@ void GameScene::Initialize() {
 
 	//タイトルの画像
 	textureHandleTitle_ = TextureManager::Load("title.png");
-	textureHandleCurtain_ = TextureManager::Load("curtain.png");
+	textureHandleCurtain_ = TextureManager::Load("cloud.png");
 	titleSprite_ = Sprite::Create(textureHandleTitle_, { 0,0 });
 	titleSprite_->SetSize({ 1280,720 });
 	curtainSprite_ = Sprite::Create(textureHandleCurtain_, curtainPos_);
@@ -73,7 +73,7 @@ void GameScene::Initialize() {
 	//クリア画像の読み込み
 	textureHandleClear_ = TextureManager::Load("clere.png");
 	stageClear_ = Sprite::Create(textureHandleClear_, { 0, 0 });
-	stageClear_->Sprite::SetPosition(Vector2(340,160));
+	stageClear_->Sprite::SetPosition(Vector2(340, 160));
 	stageClear_->SetSize(Vector2(640, 260));
 
 	//ステージセレクト用のモデルの座標の初期化
@@ -86,8 +86,12 @@ void GameScene::Initialize() {
 	player_.reset(newPlayer);
 
 	//ネコ
+	modelCat_ = Model::CreateFromOBJ("cat", true);
+	modelCatWalk_ = Model::CreateFromOBJ("catwalk", true);
+	modelCatWalkReverse_ = Model::CreateFromOBJ("catwalkreverse", true);
+
 	Cat* newCat = new Cat();
-	newCat->Initialize(model_, textureHandle_);
+	newCat->Initialize(modelCat_, modelCatWalk_, modelCatWalkReverse_);
 	cat_.reset(newCat);
 
 
@@ -113,6 +117,10 @@ void GameScene::Initialize() {
 	Goal* newGoal = new Goal();
 	newGoal->Initialize(modelGoal_);
 	goal_.reset(newGoal);
+
+	//チュートリアル
+	tutorial_ = new Tutorial();
+	tutorial_->Initialize();
 
 
 
@@ -203,11 +211,18 @@ void GameScene::Draw() {
 		SelectDrawSprite();
 	}
 	else if (scene_ == static_cast<size_t>(Scene::Game)) {
+		//チュートリアル
+		if (stage_ == 1 || stage_ == 2) {
+			if (isgoal == 0) {
+				tutorial_->Draw();
+			}
+		}
 		GameDrawSprite();
 	}
 
 	// デバッグテキストの描画
 	debugText_->DrawAll(commandList);
+
 	//
 	// スプライト描画後処理
 	Sprite::PostDraw();
@@ -329,15 +344,7 @@ void GameScene::Select()
 	player_->ReSet(map_, savemap_);
 	cat_->MapSet(map_);
 	goal_->MapSet(map_);
-
-
-	////ゴール
-	//if (input_->PushKey(DIK_RETURN)) {
-	//	map_->Loding("map1.csv");
-	//	savemap_->Loding("map1.csv");
-	//	cat_->MapSet(map_);
-	//	goal_->MapSet(map_);
-	//}
+	tutorial_->Reset();
 
 
 	//スペースキーを押したらゲームへ
@@ -346,7 +353,7 @@ void GameScene::Select()
 	}
 
 	debugText_->SetPos(0, 20);
-	debugText_->Printf("%d,%d",oldStage_,stage_);
+	debugText_->Printf("%d,%d", oldStage_, stage_);
 }
 //ステージセレクト画面の描画
 void GameScene::SelectDraw()
@@ -361,10 +368,6 @@ void GameScene::SelectDrawSprite()
 		stageSelectSprite_[i]->Draw();
 	}
 	curtainSprite_->Draw();
-	//for (int i = 0; i < 2; i++)
-	//{
-	//	biginerSprite_[i]->Draw();
-	//}
 }
 
 //ゲームの処理
@@ -389,37 +392,23 @@ void GameScene::Game()
 		if (input_->PushKey(DIK_Z)) {
 			cat_->FastSpeed();
 		}
-		if (input_->PushKey(DIK_LSHIFT)) {
-			cat_->Pause();
-		}
 		cat_->Update();
+
+		if (stage_ == 1 || stage_ == 2) {
+			tutorial_->Update(stage_);
+		}
 
 	}
 	//ゴールしたらスペースでセレクト画面
 	else if (isgoal == 1) {
 		if (input_->TriggerKey(DIK_SPACE)) {
+			scene_ = static_cast<size_t>(Scene::Select);
 			isgoal = 0;
-			if (stage_ == stageVolume) {
-				scene_ = static_cast<size_t>(Scene::Select);
-			}
-			else {
-				//次のステージ
-				stage_++;
-				//ステージセレクトの時点でマップを読み込む
-				map_->LodingSave(stage_);
-				savemap_->LodingSave(stage_);
-				//プレイヤーのリセット
-				player_->ReSet(map_, savemap_);
-				cat_->MapSet(map_);
-				goal_->MapSet(map_);
-			}
 		}
 	}
 	//Rでセレクト画面へ戻る
 	if (input_->TriggerKey(DIK_R)) {
 		scene_ = static_cast<size_t>(Scene::Select);
-		oldStage_ = 0;
-		stage_ = 1;
 		isgoal = 0;
 	}
 }

@@ -3,11 +3,12 @@
 
 
 //初期化
-void Cat::Initialize(Model* model, uint32_t textureHandle) {
+void Cat::Initialize(Model* model, Model* model2, Model* model3) {
 	assert(model);
 
 	model_ = model;
-	textureHandle_ = textureHandle;
+	modelWalk_ = model2;
+	modelWalk2_ = model3;
 
 	//シングルトンインスタンスを取得する
 	input_ = Input::GetInstance();
@@ -22,6 +23,12 @@ void Cat::Initialize(Model* model, uint32_t textureHandle) {
 
 //更新処理
 void Cat::Update() {
+	modelChengeTimer_++;
+
+	if (modelChengeTimer_ >= modelChengeTime_) {
+		modelChengeTimer_ = 0;
+		modelChenge++;
+	}
 	Move();
 
 	worldTransformUpdate(&worldTransform_);
@@ -34,14 +41,28 @@ void Cat::Update() {
 
 //描画処理
 void Cat::Draw(ViewProjection viewProjection) {
-	model_->Draw(worldTransform_, viewProjection, textureHandle_);
+
+	if (modelChenge % 4 == 0) {
+		model_->Draw(worldTransform_, viewProjection);
+
+	}
+	else if (modelChenge % 4 == 1) {
+		modelWalk_->Draw(worldTransform_, viewProjection);
+	}
+	else if (modelChenge % 4 == 2) {
+		model_->Draw(worldTransform_, viewProjection);
+	}
+	else if (modelChenge % 4 == 3) {
+		modelWalk2_->Draw(worldTransform_, viewProjection);
+	}
+
 }
 
 //移動
 void Cat::Move() {
 
 
-	if (direction_ == Direction::front&&worldTransform_.translation_.z<=0) {
+	if (direction_ == Direction::front && worldTransform_.translation_.z <= 0) {
 		OnMapCollision();
 	}
 
@@ -50,15 +71,19 @@ void Cat::Move() {
 	}
 
 	if (direction_ == Direction::front) {
+		worldTransform_.rotation_ = { 0, 135, 0 };
 		move.z = -moveSpeed;
 	}
 	else if (direction_ == Direction::right) {
+		worldTransform_.rotation_ = { 0, GetDegree(180), 0 };
 		move.x = moveSpeed;
 	}
 	else if (direction_ == Direction::back) {
+		worldTransform_.rotation_ = { 0,0, 0 };
 		move.z = moveSpeed;
 	}
 	else if (direction_ == Direction::left) {
+		worldTransform_.rotation_ = { 0, GetDegree(-180), 0 };
 		move.x = -moveSpeed;
 	}
 	worldTransform_.translation_ += move;
@@ -154,4 +179,11 @@ void Cat::MapSet(Map* map) {
 		}
 	}
 
+}
+
+
+float Cat::GetDegree(float r) {
+	r = (r * 180.0f) / 3.14;
+
+	return r;
 }

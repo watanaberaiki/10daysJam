@@ -85,9 +85,11 @@ private:
 	WorldTransform worldTransform_;
 	Model* model_ = nullptr;
 	uint32_t textureHandle_ = 0u;
-	uint32_t redTexture_ = 0u;
-	uint32_t blueTexture_ = 0u;
-	uint32_t blackTexture_ = 0u;
+	uint32_t blockAfterwallTexture_ = 0u;
+	uint32_t blockBeforeTexture_ = 0u;
+	uint32_t blockCollisionTexture_ = 0u;
+	uint32_t blockGroundTexture_ = 0u;
+
 
 	Input* input_ = nullptr;
 	DebugText* debugText_ = nullptr;
