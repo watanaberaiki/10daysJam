@@ -188,15 +188,6 @@ void Player::BlockManager(Map* map) {
 	posNumY = (posNum.y + 0.5);
 	posNumZ = (posNum.z + 0.5);
 
-	debugText_->SetPos(0, 20);
-	debugText_->Printf("%f,%f,%f", posNum.x, posNum.y, posNum.z);
-
-	debugText_->SetPos(0, 40);
-	debugText_->Printf("%d,%d,%d", posNumX, posNumY, posNumZ);
-
-	//debugText_->SetPos(0, 60);
-	//debugText_->Printf("%d",rockBlock);
-
 }
 
 //ƒuƒƒbƒN‚É‚È‚éˆ—

@@ -77,6 +77,22 @@ void Map::LodingSave(int stage)
 	{
 		Loding("map/stage4.csv");
 	}
+	if (stage == 7)
+	{
+		Loding("map/stage5.csv");
+	}
+	if (stage == 8)
+	{
+		Loding("map/stage6.csv");
+	}
+	if (stage == 9)
+	{
+		Loding("map/stage7.csv");
+	}
+	if (stage == 10)
+	{
+		Loding("map/stage8.csv");
+	}
 }
 
 void Map::Update(int stage) {

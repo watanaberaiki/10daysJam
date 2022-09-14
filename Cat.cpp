@@ -32,10 +32,6 @@ void Cat::Update() {
 	Move();
 
 	worldTransformUpdate(&worldTransform_);
-
-
-	debugText_->SetPos(0, 20);
-	debugText_->Printf("%f,%f,%f", worldTransform_.translation_.x, worldTransform_.translation_.y, worldTransform_.translation_.z);
 }
 
 
@@ -126,7 +122,7 @@ void Cat::FastSpeed() {
 }
 
 void Cat::Restore() {
-	moveSpeed = 0.03;
+	moveSpeed = 0.01;
 }
 
 void Cat::Pause() {

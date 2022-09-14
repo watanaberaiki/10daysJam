@@ -35,10 +35,6 @@ void Tutorial::Initialize() {
 
 void Tutorial::Update(int stage) {
 
-
-	debugText_->SetPos(0, 100);
-	debugText_->Printf("%d", faze_);
-
 	stage_ = stage;
 
 	if (stage == 1) {

@@ -134,7 +134,7 @@ private: // メンバ変数
 
 	//ステージ関連
 	int32_t stage_ = 1;	//現在のステージを保存しておくための変数
-	static const int stageVolume = 6;	//ステージの総数
+	static const int stageVolume = 10;	//ステージの総数
 	//ステージセレクト画面
 	int32_t oldStage_;	//保存用の変数
 	WorldTransform worldTransformStageSelect_[stageVolume];	//ステージセレクト画面用の座標
@@ -161,6 +161,15 @@ private: // メンバ変数
 	//ステージクリアスプライト
 	Sprite* stageClear_=0;
 
+
+	//テクスチャハンドル
+	uint32_t textureHandleSelectBack_ = 0;
+	uint32_t textureHandleFastBottton_ = 0;
+	//セレクト画面に戻るUI
+	Sprite* selectBack_ = 0;
+	//早送りボタンのUI
+	Sprite* fastBotton_ = 0;
+
 	//ゴール
 	std::unique_ptr<Goal> goal_;
 	Model* modelGoal_;
@@ -171,4 +180,21 @@ private: // メンバ変数
 	Model* modelSkydome_;
 
 	Tutorial* tutorial_;
+
+
+	//BGM
+	uint32_t titlebgm_ = 0;
+	uint32_t selectbgm_ = 0;
+	uint32_t gamebgm_ = 0;
+	uint32_t bgmHandle_ = 0;
+
+	//SE
+	uint32_t titlese_ = 0;
+	uint32_t selectse_ = 0;
+	uint32_t clearse_ = 0;
+
+	int isTitle = 0;
+	int isSelect = 0;
+	int isGame = 0;
+
 };

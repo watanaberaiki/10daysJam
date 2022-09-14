@@ -13,6 +13,24 @@ void GameScene::Initialize() {
 	textureHandleGround = TextureManager::Load("ground.png");
 	textureHandleWall = TextureManager::Load("wall.png");
 	model_ = Model::Create();
+
+	dxCommon_ = DirectXCommon::GetInstance();
+	input_ = Input::GetInstance();
+	audio_ = Audio::GetInstance();
+	debugText_ = DebugText::GetInstance();
+
+	//BGM
+	titlebgm_ = audio_->LoadWave("BGM_SE/titlebgm.wav");
+	selectbgm_ = audio_->LoadWave("BGM_SE/titlebgm.wav");
+	gamebgm_ = audio_->LoadWave("BGM_SE/gamebgm.wav");
+
+
+	//SE
+	titlese_ = audio_->LoadWave("BGM_SE/titlese.wav");
+	selectse_ = audio_->LoadWave("BGM_SE/selectse.wav");
+	clearse_ = audio_->LoadWave("BGM_SE/clearse.wav");
+
+
 	//マップの座標の初期化
 	for (int i = 0; i < blockY; i++)
 	{
@@ -47,9 +65,11 @@ void GameScene::Initialize() {
 	textureHandleNum_[4] = TextureManager::Load("number/4.png");
 	textureHandleNum_[5] = TextureManager::Load("number/5.png");
 	textureHandleNum_[6] = TextureManager::Load("number/6.png");
-	/*textureHandleNum_[7] = TextureManager::Load("7.png");
-	textureHandleNum_[8] = TextureManager::Load("8.png");
-	textureHandleNum_[9] = TextureManager::Load("9.png");*/
+	textureHandleNum_[7] = TextureManager::Load("number/7.png");
+	textureHandleNum_[8] = TextureManager::Load("number/8.png");
+	textureHandleNum_[9] = TextureManager::Load("number/9.png");
+	textureHandleNum_[10]= TextureManager::Load("number/10.png");
+
 	for (int i = 0; i < stageVolume; i++)
 	{
 		//ステージセレクトスプライトの初期化
@@ -73,8 +93,21 @@ void GameScene::Initialize() {
 	//クリア画像の読み込み
 	textureHandleClear_ = TextureManager::Load("clere.png");
 	stageClear_ = Sprite::Create(textureHandleClear_, { 0, 0 });
-	stageClear_->Sprite::SetPosition(Vector2(340, 160));
-	stageClear_->SetSize(Vector2(640, 260));
+	stageClear_->SetPosition(Vector2(120, 70));
+	stageClear_->SetSize(Vector2(1000, 600));
+
+	//セレクトステージに戻るUI
+	textureHandleSelectBack_ = TextureManager::Load("RUI.png");
+	selectBack_ = Sprite::Create(textureHandleSelectBack_, { 0, 0 });
+	selectBack_->SetPosition(Vector2(0, 0));
+	/*selectBack_->SetSize(Vector2(500,100));*/
+
+	//早送りボタンUI
+	textureHandleFastBottton_ = TextureManager::Load("ZUI.png");
+	fastBotton_ = Sprite::Create(textureHandleFastBottton_, { 0, 0 });
+	fastBotton_->SetPosition(Vector2(980, 0));
+	/*fastBotton_->SetSize(Vector2());*/
+
 
 	//ステージセレクト用のモデルの座標の初期化
 
@@ -122,12 +155,9 @@ void GameScene::Initialize() {
 	tutorial_ = new Tutorial();
 	tutorial_->Initialize();
 
+	isTitle = 1;
 
-
-	dxCommon_ = DirectXCommon::GetInstance();
-	input_ = Input::GetInstance();
-	audio_ = Audio::GetInstance();
-	debugText_ = DebugText::GetInstance();
+	
 }
 
 void GameScene::Update()
@@ -233,9 +263,18 @@ void GameScene::Draw() {
 //タイトル画面の処理
 void GameScene::Title()
 {
+	if (isTitle == 1) {
+		//BGM
+		bgmHandle_ = audio_->PlayWave(titlebgm_, true);
+		isTitle = 0;
+	}
 	//スペースキーを押したらカーテンをおろす
 	if (input_->TriggerKey(DIK_SPACE)) {
 		curtainFlag = true;
+
+		//SE&BGM
+		audio_->PlayWave(titlese_);
+		audio_->StopWave(bgmHandle_);
 	}
 	//カーテンの座標移動
 	if (curtainFlag)
@@ -248,6 +287,7 @@ void GameScene::Title()
 	if (curtainTimer >= curtainTime)
 	{
 		curtainTimer = 0;
+		isSelect = 1;
 		scene_ = static_cast<size_t>(Scene::Select);
 	}
 }
@@ -266,6 +306,12 @@ void GameScene::TitleDrawSprite()
 //ステージセレクト画面の処理
 void GameScene::Select()
 {
+	if (isSelect == 1) {
+		//BGM
+		bgmHandle_ = audio_->PlayWave(selectbgm_, true);
+		audio_->SetVolume(bgmHandle_, 0.5);
+		isSelect = 0;
+	}
 	//カーテンの座標移動
 	if (curtainFlag)
 	{
@@ -349,7 +395,14 @@ void GameScene::Select()
 
 	//スペースキーを押したらゲームへ
 	if (input_->TriggerKey(DIK_SPACE)) {
+		//BGM&SE
+		audio_->PlayWave(selectse_);
+		audio_->StopWave(bgmHandle_);
+		isGame = 1;
 		scene_ = static_cast<size_t>(Scene::Game);
+
+		
+
 	}
 
 	debugText_->SetPos(0, 20);
@@ -373,14 +426,21 @@ void GameScene::SelectDrawSprite()
 //ゲームの処理
 void GameScene::Game()
 {
+	if (isGame == 1) {
+		//BGM
+		bgmHandle_ = audio_->PlayWave(gamebgm_, true);
+		audio_->SetVolume(bgmHandle_, 0.5);
+		isGame = 0;
+	}
 	// レールカメラ
 	railCamera_->Update(player_->GetWorldTransform());
 	railCamera_->mode_ = static_cast<size_t>(RailCamera::Mode::standBy);
 
-	//判定の処理
-	MapCollision();
+
 
 	if (isgoal == 0) {
+		//判定の処理
+		MapCollision();
 		//プレイヤー
 		player_->Update(map_);
 
@@ -402,14 +462,20 @@ void GameScene::Game()
 	//ゴールしたらスペースでセレクト画面
 	else if (isgoal == 1) {
 		if (input_->TriggerKey(DIK_SPACE)) {
-			scene_ = static_cast<size_t>(Scene::Select);
 			isgoal = 0;
+			audio_->StopWave(bgmHandle_);
+			isSelect = 1;
+			scene_ = static_cast<size_t>(Scene::Select);
+			
 		}
 	}
 	//Rでセレクト画面へ戻る
 	if (input_->TriggerKey(DIK_R)) {
-		scene_ = static_cast<size_t>(Scene::Select);
 		isgoal = 0;
+		audio_->StopWave(bgmHandle_);
+		isSelect = 1;
+		scene_ = static_cast<size_t>(Scene::Select);
+		
 	}
 }
 
@@ -446,7 +512,12 @@ void GameScene::GameDraw()
 }
 
 void GameScene::GameDrawSprite() {
-	if (isgoal == 1) {
+	if (isgoal == 0) {
+		selectBack_->Draw();
+		fastBotton_->Draw();
+	}
+
+	else if (isgoal == 1) {
 		stageClear_->Draw();
 	}
 }
@@ -656,6 +727,7 @@ void GameScene::MapCollision()
 	if (leftCat) {
 		if (goal_->GetTranslation().x - 1 < cat_->GetTranslation().x + (cat_->GetSize() / 2) && cat_->GetTranslation().x - (cat_->GetSize() / 2) < goal_->GetTranslation().x + 1) {
 			if (goal_->GetTranslation().z - 1 < cat_->GetTranslation().z + (cat_->GetSize() / 2) && cat_->GetTranslation().z - (cat_->GetSize() / 2) < goal_->GetTranslation().z + 1) {
+				audio_->PlayWave(clearse_);
 				isgoal = 1;
 			}
 		}
